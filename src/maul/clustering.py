@@ -69,7 +69,41 @@ def wconsensus(P, W, k, random_state=None):
     
     return clusters.labels_
     
+##### Clustering Utility Based on Averaged information Gain of isolating Each cluster (CUBAGE)#####
+
+import pandas as pd
+from scipy.stats import entropy
+
+def cubage_score(X, label):
+
+    X = pd.DataFrame(X)
+    k_ = max(label)+1
+
+    HU = sum(entropy(X))
+    X['k'] = label
+
+    H = []
+    W = []
+    for i in range(k_):
+        H.append(entropy(X[X.k == i].loc[:, X[X.k == i].columns != 'k']))
+        W.append(X[X.k == i].shape[0]/X.shape[0])
+
+    H = np.array([sum(n) for n in H])
+    W = np.array(W)
+
+    HC = []
+    for i in range(max(label)+1):
+        HC.append(entropy(X[X.k != i].loc[:, X[X.k != i].columns != 'k']))
+
+    HC = np.array([sum(n) for n in HC])
+
+    E = W@H
+    AGE = HU - 1/k_*(E + (1-W)@HC)
+    CUBAGE = AGE/E
     
+    return CUBAGE
+
+
 ##### Density-core-based Clustering Validation Index (DCVI) #####
 
 def MST(G, show=False): # Prim's Algorithm
