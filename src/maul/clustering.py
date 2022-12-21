@@ -1,6 +1,41 @@
+##### Consensus Index #####
+
 from sklearn.cluster import SpectralClustering
+from sklearn.metrics.cluster import adjusted_rand_score
 from numpy.random import RandomState
 import numpy as np
+
+def consensus_score(P):
+    """
+    Parameters:
+    `P` list: Partitions [y1, y2,..., yk]
+
+    Return:
+    `consensus_score`: float
+    
+    """
+        
+    scores = []
+    for i in range(len(P)):
+        for j in range(i+1, len(P)):
+            scores.append(adjusted_rand_score(P[i], P[j]))
+            
+    return sum(scores)
+
+def get_onehot(arr):
+    """
+    Parameters:
+    `arr`: array to encode
+
+    Return:
+    `encoded_array`: encoded array
+    
+    """
+    
+    encoded_array = np.zeros((arr.size, arr.max()+1), dtype=int)
+    encoded_array[np.arange(arr.size), arr] = 1 
+
+    return encoded_array
 
 def wconsensus(P, W, k, random_state=None):
     """
@@ -11,7 +46,7 @@ def wconsensus(P, W, k, random_state=None):
     `random_state` int: Random seed
     
     Return:
-    `labels`: array
+    `label`: array
     
     """
     
@@ -33,3 +68,47 @@ def wconsensus(P, W, k, random_state=None):
     clusters = SpectralClustering(n_clusters=k, affinity='precomputed', random_state=random_state).fit(S_)
     
     return clusters.labels_
+    
+    
+##### Density-core-based Clustering Validation Index (DCVI) #####
+
+def MST(G, show=False): # Prim's Algorithm
+    """
+    Parameters:
+    `G` array: Adjacency matrix
+    `show` bool: Show the vertices with the weights or not 
+    
+    Return:
+    `w` array: Vertex weights
+    
+    """
+    w=[]
+    INF = 9999999
+    V = len(G)
+    selected = [0]*V
+    no_edge = 0
+    selected[0] = True
+    
+    if show == True:
+        print("Edge:Weight")
+    
+    while (no_edge < V - 1):
+        minimum = INF
+        x = 0
+        y = 0
+        for i in range(V):
+            if selected[i]:
+                for j in range(V):
+                    if ((not selected[j]) and G[i][j]):  
+                        if minimum > G[i][j]:
+                            minimum = G[i][j]
+                            x = i
+                            y = j
+        if show == True:
+            print(str(x) + "-" + str(y) + ":" + str(G[x][y]))
+            
+        w.append(G[x][y])
+        selected[y] = True
+        no_edge += 1
+        
+    return w
