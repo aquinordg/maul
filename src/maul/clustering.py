@@ -1,3 +1,7 @@
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action='ignore', category=UserWarning)
+
 ##### Consensus Index #####
 
 from sklearn.cluster import SpectralClustering
@@ -72,28 +76,70 @@ def wconsensus(P, W, k, random_state=None):
 ##### Clustering Utility Based on Averaged information Gain of isolating Each cluster (CUBAGE)#####
 
 import pandas as pd
-from scipy.stats import entropy
 
-def cubage_score(X, label):
+def entropy_ajusted_arr(arr):
+    if len(np.shape(arr)) == 2:
+        E = []
+        for i in range(np.shape(arr)[1]):
+            p1 = sum(arr[:,i])/len(arr[:,i])
+            p0 = 1 - p1
 
+            if (p1 == 0) | (p0 == 0):
+                E.append(0)
+            else:
+                E.append(-((p0 * np.log2(p0)) + (p1 * np.log2(p1))))
+                
+    else:
+        p1 = sum(arr)/len(arr)
+        p0 = 1 - p1
+        
+        E = -((p0 * np.log2(p0)) + (p1 * np.log2(p1)))
+        
+    return E
+
+def entropy_ajusted_df(df):
+    if len(df.shape) == 2:
+        E = []
+        for i in range(df.shape[1]):
+            p1 = sum(df[i])/len(df[i])
+            p0 = 1 - p1
+
+            if (p1 == 0) | (p0 == 0):
+                E.append(0)
+            else:
+                E.append(-((p0 * np.log2(p0)) + (p1 * np.log2(p1))))
+
+    else:
+        p1 = sum(df)/len(df)
+        p0 = 1 - p1
+
+        E = -((p0 * np.log2(p0)) + (p1 * np.log2(p1)))
+
+    return E
+
+def cubage_score(X, labels):
+    
+    assert type(X).__module__ == np.__name__
+    assert type(labels).__module__ == np.__name__
+    
     X = pd.DataFrame(X)
-    k_ = max(label)+1
+    k_ = max(labels)+1
 
-    HU = sum(entropy(X))
-    X['k'] = label
-
+    HU = sum(entropy_ajusted_df(X))
+    X['k'] = labels
+    
     H = []
     W = []
     for i in range(k_):
-        H.append(entropy(X[X.k == i].loc[:, X[X.k == i].columns != 'k']))
+        H.append(entropy_ajusted_df(X[X.k == i].loc[:, X[X.k == i].columns != 'k']))
         W.append(X[X.k == i].shape[0]/X.shape[0])
 
     H = np.array([sum(n) for n in H])
     W = np.array(W)
 
     HC = []
-    for i in range(max(label)+1):
-        HC.append(entropy(X[X.k != i].loc[:, X[X.k != i].columns != 'k']))
+    for i in range(k_):
+        HC.append(entropy_ajusted_df(X[X.k != i].loc[:, X[X.k != i].columns != 'k']))
 
     HC = np.array([sum(n) for n in HC])
 
@@ -102,7 +148,6 @@ def cubage_score(X, label):
     CUBAGE = AGE/E
     
     return CUBAGE
-
 
 ##### Density-core-based Clustering Validation Index (DCVI) #####
 
