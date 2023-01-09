@@ -78,6 +78,15 @@ def wconsensus(P, W, k, random_state=None):
 import pandas as pd
 
 def entropy_ajusted_arr(arr):
+    """
+    Parameters:
+    `arr` array
+    
+    Return:
+    `E`: Entropy
+    
+    """
+
     if len(np.shape(arr)) == 2:
         E = []
         for i in range(np.shape(arr)[1]):
@@ -98,6 +107,14 @@ def entropy_ajusted_arr(arr):
     return E
 
 def entropy_ajusted_df(df):
+    """
+    Parameters:
+    `df` DataFrame
+    
+    Return:
+    `E`: Entropy
+    
+    """
     if len(df.shape) == 2:
         E = []
         for i in range(df.shape[1]):
@@ -118,6 +135,15 @@ def entropy_ajusted_df(df):
     return E
 
 def cubage_score(X, labels):
+    """
+    Parameters:
+    `X` array: Data
+    `labels` array: Labels 
+    
+    Return:
+    `CUBAGE` float: Entropy
+    
+    """
     
     assert type(X).__module__ == np.__name__
     assert type(labels).__module__ == np.__name__
