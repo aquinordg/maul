@@ -199,7 +199,7 @@ def cdr_score(X, labels):
     `labels` array: Labels 
     
     Return:
-    `CUBAGE` float: Score
+    `cdr` float: Score
     
     """
 
@@ -213,45 +213,34 @@ def cdr_score(X, labels):
 
     unif = []
     nk = []
-
+    
     for k in range(k_):
-        #print('K:', k)
+        #print('K:', k) ############## <<<
         points = X[X.k == k].loc[:, X[X.k == k].columns != 'k'].reset_index(drop=True) #filter the points of a specific cluster
         nk.append(points.shape[0]) #get the number of examples in the each cluster
-        l = []
-
-        for i in range(len(points)):
-            l_aux = []
-            for j in range(len(points)):
-                if i != j:
-                    l_aux.append(np.linalg.norm(points.loc[i] - points.loc[j])) #euclidean distance for each combination exclusive of points
-            
-            #print('dist:', l_aux)
-            if len(l_aux) > 0:
-                l.append(min(l_aux)) #get local density
-            else:
-                l.append(0)
-                
-            
-
+        
+        df = pd.DataFrame(euclidean_distances(points, points)) #distance
+        df.replace(0, np.nan, inplace=True)
+        l = df.min(axis=0)
+        
         avg_den_k = sum(l)/len(l) #get density of clusters
-        #print('local_den:', l)
-        #print('avg_den_k:', avg_den_k)
+        #print('local_den:', l) ############## <<<
+        #print('avg_den_k:', avg_den_k) ############## <<<
         
         if len(l) == 1:
             unif.append(0)
-            #print('local_den - avg_den_k:', 0, '\n')
+            #print('local_den - avg_den_k:', 0, '\n') ############## <<<
             
         else:
             unif.append(sum([abs(_- avg_den_k) for _ in l])/avg_den_k) #get uniformity of clusters
-            #print('local_den - avg_den_k:', [abs(_- avg_den_k) for _ in l], '\n')
+            #print('local_den - avg_den_k:', [abs(_- avg_den_k) for _ in l], '\n') ############## <<<
 
     cdr = sum([nk[i]*unif[i] for i in range(len(unif))])/sum(nk) #get Contiguous Density Region (CDR) index.
-    #print('nk[i]*unif[i]:', [nk[i]*unif[i] for i in range(len(unif))])
-    #print('unif:', unif)
-    #print('nk:', nk, '\n')
+    #print('nk[i]*unif[i]:', [nk[i]*unif[i] for i in range(len(unif))]) ############## <<<
+    #print('unif:', unif) ############## <<<
+    #print('nk:', nk, '\n') ############## <<<
     
-    return cdr    
+    return cdr
   
 ##### Density-core-based Clustering Validation Index (DCVI) #####
 
