@@ -290,7 +290,7 @@ def MST(G, show=False): # Prim's Algorithm
 
 import numpy as np
 from numpy.random import RandomState
-import munkres
+from scr.maul import munkres
 from sklearn.cluster import KMeans
 import argparse
 
