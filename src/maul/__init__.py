@@ -4,9 +4,11 @@ warnings.simplefilter(action='ignore', category=UserWarning)
 
 from sklearn.cluster import SpectralClustering
 from sklearn.metrics.cluster import adjusted_rand_score
+from sklearn.metrics.pairwise import euclidean_distances
 from numpy.random import RandomState
 import numpy as np
 import pandas as pd
+import math
 
 ##### Consensus Index #####
 
@@ -73,7 +75,7 @@ def wconsensus(P, W, k, random_state=None):
     clusters = SpectralClustering(n_clusters=k, affinity='precomputed', random_state=random_state).fit(S_)
     
     return clusters.labels_
-    
+
 ##### Clustering Utility Based on Averaged information Gain of isolating Each cluster (CUBAGE)#####
 
 def entropy_ajusted_arr(arr):
