@@ -15,7 +15,6 @@ from numpy.random import RandomState
 import math
 
 import matplotlib.pyplot as plt
-%matplotlib inline
 
 ##### Graphical Analysis using TSNE and PCA #####
 
