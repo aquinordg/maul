@@ -5,10 +5,86 @@ warnings.simplefilter(action='ignore', category=UserWarning)
 from sklearn.cluster import SpectralClustering
 from sklearn.metrics.cluster import adjusted_rand_score
 from sklearn.metrics.pairwise import euclidean_distances
-from numpy.random import RandomState
-import numpy as np
+from sklearn.manifold import TSNE
+from sklearn.decomposition import PCA
+
 import pandas as pd
+
+import numpy as np
+from numpy.random import RandomState
 import math
+
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+##### Graphical Analysis using TSNE and PCA #####
+
+def graph_analysis(Xbin, y, dim = 2, size = 10, title = ''):
+    """
+    Parameters:
+    `Xbin` array: binary data without labels
+    `y` array: labels
+    `dim` int: 2 = 2d, 3 = 3d
+    `size` int: binary data without labels
+    `title` string: binary data without labels
+
+    Return:
+    `TSNE` and `PCA` graphs: graphs
+    
+    """
+    
+    plt.rcParams['figure.figsize'] = [size, size]
+    
+    cdict = dict()
+    color = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+    for i in range(len(np.unique(y))):
+        cdict[np.unique(y)[i]] = color[i]
+    
+    if dim == 2:
+        X_tsne = TSNE(n_components=2, perplexity=10, learning_rate='auto', metric='hamming', init='random', random_state=37, square_distances=True).fit_transform(Xbin)
+        X_pca = PCA(n_components=2).fit_transform(Xbin)
+
+        fig, ax = plt.subplots()
+        for g in np.unique(y):
+            ix = np.where(y == g)
+            ax.scatter(X_tsne[:,0][ix], X_tsne[:,1][ix], c = cdict[g], label = g)
+        ax.legend()
+        plt.title(f'TSNE {title}')
+        plt.show()
+
+        fig, ax = plt.subplots()
+        for g in np.unique(y):
+            ix = np.where(y == g)
+            ax.scatter(X_pca[:,0][ix], X_pca[:,1][ix], c = cdict[g], label = g)
+        ax.legend()
+        plt.title(f'PCA {title}')
+        plt.show()
+        
+    else:
+        X_tsne = TSNE(n_components=3, perplexity=10, learning_rate='auto', metric='hamming', init='random', random_state=37, square_distances=True).fit_transform(Xbin)
+        X_pca = PCA(n_components=3).fit_transform(Xbin)
+        
+        fig = plt.figure()
+        ax = fig.add_subplot(projection='3d')
+
+        for g in np.unique(y):
+            ix = np.where(y == g)
+            ax.scatter(X_tsne[:,0][ix], X_tsne[:,1][ix], X_tsne[:,2][ix], c = cdict[g], label = g)
+        ax.legend()
+        plt.title(f'TSNE {title}')
+        plt.show()
+
+        fig = plt.figure()
+        ax = fig.add_subplot(projection='3d')
+
+        for g in np.unique(y):
+            ix = np.where(y == g)
+            ax.scatter(X_pca[:,0][ix], X_pca[:,1][ix], X_tsne[:,2][ix], c = cdict[g], label = g)
+        ax.legend()
+        plt.title(f'PCA {title}')
+        plt.show()
+    
+    return
 
 ##### Consensus Index #####
 
@@ -76,7 +152,7 @@ def wconsensus(P, W, k, random_state=None):
     
     return clusters.labels_
 
-##### Clustering Utility Based on Averaged information Gain of isolating Each cluster (CUBAGE)#####
+##### Clustering Utility Based on Averaged information Gain of isolating Each cluster (CUBAGE) #####
 
 def entropy_ajusted_arr(arr):
     """
