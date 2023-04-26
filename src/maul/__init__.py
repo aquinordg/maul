@@ -16,6 +16,23 @@ import math
 
 import matplotlib.pyplot as plt
 
+##### Clean rows with a pattern #####
+
+def drop_patt(df, pt):
+    """
+    Parameters:
+    `Xbin` DataFrame: df to clean
+    `pt` string: pattern to remove
+
+    Return:
+    `df` DataFrame: df without rows with pattern
+    
+    """
+
+    df = df[df != pt]
+    df = df.dropna()
+    return df
+
 ##### Graphical Analysis using TSNE and PCA #####
 
 def graph_analysis(Xbin, y, dim = 2, size = 10, title = ''):
